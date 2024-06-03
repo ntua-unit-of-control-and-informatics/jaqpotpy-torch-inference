@@ -43,23 +43,16 @@ def get_db():
              description="Endpoint to upload a PyTorch Model and store it in the database.")
 async def model_upload(req: Request):
 
-    data = await req.json()
+    model_data = await req.json()
 
-    data_for_db = {
-        'files': data['files'],
-        'task_params': data['task_params'],
-        'metadata': data['metadata'],
-    }
-
-    # model_id = str(uuid.uuid4())
-    model_id = 0
-
-    db[model_id] = data_for_db
-
-    task = data['metadata']['task']
-
-    task_params = data['task_params']
-    metadata = data['metadata']
+    # data_for_db = {
+    #     'files': data['files'],
+    #     'task_params': data['task_params'],
+    #     'metadata': data['metadata'],
+    # }
+    model_data['id'] = 0
+    model_id = model_data['id']
+    db[model_id] = model_data
 
     return ModelUploadResponse(model_id=model_id, message="Model uploaded successfully")
 
@@ -71,50 +64,19 @@ async def model_upload(req: Request):
             #  response_model=ModelUploadResponse,
              summary="",
              description="")
-async def predict(req: PredictRequest):
+async def predict(req: Request):
 
-    model_id = req.model_id
-    user_id = req.user_id
-    user_input = req.user_input
-    
+    request_data = await req.json()
 
-    model_data = db[model_id] # will need await when a proper Database is used
+    model_id = request_data['model_id']
+    user_id = request_data['user_id']
+    user_input = request_data['user_input']
 
-    model_type = model_data['metadata']['model_type']
+    model_data = db[model_id]  # will need await when a proper Database is used
 
+    out = handle_prediction(model_data, user_input)
 
-    outt = handle_prediction(model_data, user_input)
-
-
-
-    # files = model_row['files']
-
-    # model_scripted_base64 = files['model_scripted']
-    # featurizer_pickle_base64 = files['featurizer_pickle']
-
-
-    # model_scripted_content = base64.b64decode(model_scripted_base64)
-    # featurizer_pickle_content = base64.b64decode(featurizer_pickle_base64)
-    
-    # model_buffer = io.BytesIO(model_scripted_content)
-    # featurizer_buffer = io.BytesIO(featurizer_pickle_content)
-
-    # model_buffer.seek(0)
-    # featurizer_buffer.seek(0)
-
-    # model = torch.jit.load(model_buffer)
-    # featurizer = pickle.load(featurizer_buffer)
-    
-
-    # task_params = model_row['task_params']
-    # metadata = model_row['metadata']
-
-    # task = metadata['task']
-
-    # print(task_params, metadata, task)
-
-    return {'it is': 'ok'}
-
+    return out
 
 
     

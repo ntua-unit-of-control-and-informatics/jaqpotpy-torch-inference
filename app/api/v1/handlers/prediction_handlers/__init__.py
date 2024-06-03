@@ -1,0 +1,3 @@
+from .regression_graph_predict import regression_graph_predict
+from .binary_graph_predict import binary_graph_predict
+# from .multiclass_graph_predict import multiclass_graph_predict
