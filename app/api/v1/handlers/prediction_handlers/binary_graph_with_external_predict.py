@@ -3,9 +3,11 @@ import io
 import torch
 import pickle
 import torch.nn.functional as F
+import pandas as pd
 import inspect
 
-def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
+
+def binary_graph_with_external_predict(model_data: dict, user_inputs: list[dict]):
 
     model_scripted_base64 = model_data['actualModel']
     model_scripted_content = base64.b64decode(model_scripted_base64)
@@ -19,20 +21,37 @@ def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
     featurizer_buffer.seek(0)
     featurizer = pickle.load(featurizer_buffer)
 
+    external_preprocessor_pickle_base64 = model_data['additional_model_params']['external_preprocessor']
+    external_preprocessor_pickle_content = base64.b64decode(external_preprocessor_pickle_base64)
+    external_preprocessor_buffer = io.BytesIO(external_preprocessor_pickle_content)
+    external_preprocessor_buffer.seek(0)
+    external_preprocessor = pickle.load(external_preprocessor_buffer)
+
     decision_threshold = model_data['additional_model_params']['decision_threshold']
+
+    df = pd.DataFrame(user_inputs)
+    smiles = df['SMILES'].tolist()
+    df = df.drop(columns=['SMILES'])
+
+    df = external_preprocessor.transform(df)
+    if isinstance(df, pd.DataFrame):
+         df = df.to_numpy()
+    df = torch.tensor(df).float()
 
     results = []
 
-    for i, user_input in enumerate(user_inputs):
-        sm = user_input['SMILES']
+    for i, (sm, external) in enumerate(zip(smiles, df)):
         data_point = featurizer(sm)
         data_point.batch = torch.zeros(data_point.size(0), dtype=torch.int64)
-        
+
+        external = external.unsqueeze(0)
+
         model.eval()
         with torch.no_grad():
             kwargs = {}
             kwargs['x'] = data_point.x
             kwargs['edge_index'] = data_point.edge_index
+            kwargs['external'] = data_point.external
             kwargs['batch'] = data_point.batch
 
             if 'edge_attr' in inspect.signature(model.forward).parameters:
@@ -48,13 +67,5 @@ def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
             'prob': probs[0].item()
         }
         results.append(result)
-
+        
     return results
-
-
-    # task_params = model_data['task_params']
-    # metadata = model_data['metadata']
-
-    # task = metadata['task']
-
-    # print(task_params, metadata, task)

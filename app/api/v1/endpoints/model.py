@@ -26,6 +26,7 @@ router = APIRouter(tags=["Models"])
 
 db = {}
 
+
 @router.get("/")
 def read_root():
     return {"app": "jaqpotpy-torch-inference",
@@ -50,7 +51,7 @@ async def model_upload(req: Request):
     #     'task_params': data['task_params'],
     #     'metadata': data['metadata'],
     # }
-    model_data['id'] = 0
+    model_data['id'] = len(db.keys())
     model_id = model_data['id']
     db[model_id] = model_data
 
@@ -68,15 +69,25 @@ async def predict(req: Request):
 
     request_data = await req.json()
 
-    model_id = request_data['model_id']
-    user_id = request_data['user_id']
-    user_input = request_data['user_input']
 
+    # model_data = request_data['model'] # 
+    model_id = request_data['model']['id']
     model_data = db[model_id]  # will need await when a proper Database is used
 
-    out = handle_prediction(model_data, user_input)
+    # user_id = request_data['user_id']
+    dataset = request_data['dataset']
+    dataset_type = dataset['type']
 
-    return out
+    input_type = dataset['input']['type']
+    input_values = dataset['input']['values']
+
+    results = handle_prediction(model_data, input_values)
+
+    res = {
+        'results': results
+    }
+
+    return res
 
 
     
