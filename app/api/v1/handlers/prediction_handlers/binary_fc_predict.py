@@ -41,7 +41,7 @@ def binary_fc_predict(model_data: dict, user_inputs: list[dict]):
         result = {
             'id': i,
             'prediction': preds[0].item(),
-            'prob': probs[0].item()
+            'prob': [probs[0].item(), 1 - probs[0].item()]
         }
         results.append(result)
         

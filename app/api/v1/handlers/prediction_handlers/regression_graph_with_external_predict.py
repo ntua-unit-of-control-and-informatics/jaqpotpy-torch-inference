@@ -2,10 +2,8 @@ import base64
 import io
 import torch
 import pickle
-import torch.nn.functional as F
 import pandas as pd
 # import jaqpotpy
-import inspect
 
 
 def regression_graph_with_external_predict(model_data: dict, user_inputs: list[dict]):
@@ -50,16 +48,12 @@ def regression_graph_with_external_predict(model_data: dict, user_inputs: list[d
 
         model.eval()
         with torch.no_grad():
-            kwargs = {}
-            kwargs['x'] = data_point.x
-            kwargs['edge_index'] = data_point.edge_index
-            kwargs['external'] = data_point.external
-            kwargs['batch'] = data_point.batch
-
-            if 'edge_attr' in inspect.signature(model.forward).parameters:
-                kwargs['edge_attr'] = data_point.edge_attr
-
-            outputs = model(**kwargs).squeeze(-1)
+            try:
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch, edge_attr=data_point.edge_attr).squeeze(-1)
+            except RuntimeError: # if model doesn't support edge_attr (edge features)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch).squeeze(-1)
+            
+            outputs = outputs.squeeze(-1)
             outputs.mul_(normalization_std).add_(normalization_mean)
 
         result = {

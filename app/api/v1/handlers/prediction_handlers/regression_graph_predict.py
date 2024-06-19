@@ -3,7 +3,6 @@ import io
 import torch
 import pickle
 # import jaqpotpy
-import inspect
 
 
 def regression_graph_predict(model_data: dict, user_inputs: list[dict]):
@@ -33,15 +32,13 @@ def regression_graph_predict(model_data: dict, user_inputs: list[dict]):
 
         model.eval()
         with torch.no_grad():
-            kwargs = {}
-            kwargs['x'] = data_point.x
-            kwargs['edge_index'] = data_point.edge_index
-            kwargs['batch'] = data_point.batch
-
-            if 'edge_attr' in inspect.signature(model.forward).parameters:
-                kwargs['edge_attr'] = data_point.edge_attr
-
-            outputs = model(x=data_point.x, edge_index=data_point.edge_index, batch=data_point.batch).squeeze(-1)
+            try:
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, batch=data_point.batch, edge_attr=data_point.edge_attr)
+            except RuntimeError: # if model doesn't support edge_attr (edge features)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, batch=data_point.batch)
+        
+            outputs.mul_(normalization_std).add_(normalization_mean)
+            outputs = outputs.squeeze(-1)
 
         result = {
             'id': i,

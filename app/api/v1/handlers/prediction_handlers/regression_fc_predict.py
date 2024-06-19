@@ -2,7 +2,6 @@ import base64
 import io
 import torch
 import pickle
-import torch.nn.functional as F
 import pandas as pd
 
 
