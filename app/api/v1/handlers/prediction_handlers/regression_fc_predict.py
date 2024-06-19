@@ -3,6 +3,7 @@ import io
 import torch
 import pickle
 import pandas as pd
+from schemas import SinglePredictionResult
 
 
 def regression_fc_predict(model_data: dict, user_inputs: list[dict]):
@@ -36,10 +37,10 @@ def regression_fc_predict(model_data: dict, user_inputs: list[dict]):
             outputs = model(x).squeeze(-1)
             outputs.mul_(normalization_std).add_(normalization_mean)
 
-        result = {
-            'id': i,
-            'prediction': outputs[0].item(),
-        }
+        result = SinglePredictionResult(
+            id=i, 
+            prediction=outputs[0].item()
+        )
         results.append(result)
         
     return results

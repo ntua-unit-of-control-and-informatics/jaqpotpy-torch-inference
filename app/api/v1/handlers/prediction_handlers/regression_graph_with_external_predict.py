@@ -4,6 +4,7 @@ import torch
 import pickle
 import pandas as pd
 # import jaqpotpy
+from schemas import SinglePredictionResult
 
 
 def regression_graph_with_external_predict(model_data: dict, user_inputs: list[dict]):
@@ -56,10 +57,10 @@ def regression_graph_with_external_predict(model_data: dict, user_inputs: list[d
             outputs = outputs.squeeze(-1)
             outputs.mul_(normalization_std).add_(normalization_mean)
 
-        result = {
-            'id': i,
-            'prediction': outputs[0].item(),
-        }
+        result = SinglePredictionResult(
+            id=i, 
+            prediction=outputs[0].item()
+        )
         results.append(result)
         
     return results

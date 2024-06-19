@@ -3,6 +3,8 @@ import io
 import torch
 import pickle
 import torch.nn.functional as F
+from schemas import SinglePredictionResult
+
 
 def multiclass_graph_predict(model_data: dict, user_inputs: list[dict]):
     
@@ -35,11 +37,11 @@ def multiclass_graph_predict(model_data: dict, user_inputs: list[dict]):
             probs = F.softmax(outputs, dim=1)
             _, preds = torch.max(probs, 1)
 
-        result = {
-            'id': i,
-            'prediction': preds[0].item(),
-            'prob': probs.unsqueeze(0).tolist()
-        }
+        result = SinglePredictionResult(
+            id=i,
+            prediction=preds[0].item(),
+            prob=probs.squeeze(0).tolist()
+        )
         results.append(result)
 
     return results

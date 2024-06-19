@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request
 
 import uuid
-from schemas.response import ModelUploadResponse
-from schemas.predict import PredictRequest
+from schemas import ModelUploadResponse
+from schemas import PredictResponse
 import base64
 import io
 import torch
@@ -62,9 +62,9 @@ async def model_upload(req: Request):
 
 
 @router.post("/predict/", 
-            #  response_model=ModelUploadResponse,
+             response_model=PredictResponse,
              summary="",
-             description="")
+             description="Endpoint to make predictions using a PyTorch model")
 async def predict(req: Request):
 
     request_data = await req.json()
@@ -83,11 +83,8 @@ async def predict(req: Request):
 
     results = handle_prediction(model_data, input_values)
 
-    res = {
-        'results': results
-    }
 
-    return res
+    return PredictResponse(results=results, message="Successful Prediction")
 
 
     

@@ -3,6 +3,7 @@ import io
 import torch
 import pickle
 # import jaqpotpy
+from schemas import SinglePredictionResult
 
 
 def regression_graph_predict(model_data: dict, user_inputs: list[dict]):
@@ -40,10 +41,10 @@ def regression_graph_predict(model_data: dict, user_inputs: list[dict]):
             outputs.mul_(normalization_std).add_(normalization_mean)
             outputs = outputs.squeeze(-1)
 
-        result = {
-            'id': i,
-            'prediction': outputs[0].item(),
-        }
+        result = SinglePredictionResult(
+            id=i, 
+            prediction=outputs[0].item()
+        )
         results.append(result)
 
     return results

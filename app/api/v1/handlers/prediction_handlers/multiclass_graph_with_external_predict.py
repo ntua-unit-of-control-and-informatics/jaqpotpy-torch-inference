@@ -4,6 +4,7 @@ import torch
 import pickle
 import torch.nn.functional as F
 import pandas as pd
+from schemas import SinglePredictionResult
 
 
 def multiclass_graph_with_external_predict(model_data, user_inputs):
@@ -53,11 +54,11 @@ def multiclass_graph_with_external_predict(model_data, user_inputs):
             probs = F.softmax(outputs, dim=1)
             _, preds = torch.max(probs, 1)
 
-        result = {
-            'id': i,
-            'prediction': preds[0].item(),
-            'prob': probs.unsqueeze(0).tolist()
-        }
+        result = SinglePredictionResult(
+            id=i,
+            prediction=preds[0].item(),
+            prob=probs.squeeze(0).tolist()
+        )
         results.append(result)
         
     return results

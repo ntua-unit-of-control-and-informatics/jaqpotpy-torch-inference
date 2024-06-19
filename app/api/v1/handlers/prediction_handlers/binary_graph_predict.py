@@ -3,6 +3,8 @@ import io
 import torch
 import pickle
 import torch.nn.functional as F
+from schemas import SinglePredictionResult
+
 
 def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
 
@@ -38,11 +40,11 @@ def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
             probs = F.sigmoid(outputs)
             preds = (probs > decision_threshold).int()
 
-        result = {
-            'id': i,
-            'prediction': preds[0].item(),
-            'prob': [probs[0].item(), 1 - probs[0].item()]
-        }
+        result = SinglePredictionResult(
+            id=i, 
+            prediction=preds[0].item(), 
+            prob=[probs[0].item(), 1 - probs[0].item()]
+        )
         results.append(result)
 
     return results
