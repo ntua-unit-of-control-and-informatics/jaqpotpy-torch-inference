@@ -7,6 +7,23 @@ from schemas import SinglePredictionResult
 
 
 def regression_graph_predict(model_data: dict, user_inputs: list[dict]):
+    """
+    Perform regression using a graph-based model for SMILES.
+
+    Args:
+    - model_data (dict): A dictionary containing model information and parameters.
+        - 'actualModel' (str): Base64-encoded representation of the model script.
+        - 'additional_model_params' (dict): Additional model parameters.
+            - 'featurizer' (str): Base64-encoded representation of the featurizer used for input.
+            - 'normalization_mean' (float): Mean used to normalize the true values of the regression variables before model training. 
+                                            The model predicts normalized values, we need the mean for de-normalization.
+            - 'normalization_std' (float): Standard deviation used to normalize the true values of the regression variables before model training.
+                                           The model predicts normalized values, we need the standard deviation for de-normalization.
+    - user_inputs (list[dict]): List of user inputs, where each input is a dictionary containing at least 'SMILES'.
+
+    Returns:
+    - list[SinglePredictionResult]: A list of prediction results for each user input.
+    """
 
     model_scripted_base64 = model_data['actualModel']
     model_scripted_content = base64.b64decode(model_scripted_base64)

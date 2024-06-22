@@ -7,7 +7,21 @@ from schemas import SinglePredictionResult
 
 
 def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
+    """
+    Perform binary classification using a graph-based model for SMILES.
 
+    Args:
+    - model_data (dict): A dictionary containing model information and parameters.
+        - 'actualModel' (str): Base64-encoded representation of the model script.
+        - 'additional_model_params' (dict): Additional model parameters.
+            - 'featurizer' (str): Base64-encoded representation of the featurizer used for input.
+            - 'decision_threshold' (float): Decision threshold for classification.
+    - user_inputs (list[dict]): List of user inputs, where each input is a dictionary containing at least 'SMILES'.
+
+    Returns:
+    - list[SinglePredictionResult]: A list of prediction results for each user input.
+    """
+    
     model_scripted_base64 = model_data['actualModel']
     model_scripted_content = base64.b64decode(model_scripted_base64)
     model_buffer = io.BytesIO(model_scripted_content)
@@ -48,11 +62,3 @@ def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
         results.append(result)
 
     return results
-
-
-    # task_params = model_data['task_params']
-    # metadata = model_data['metadata']
-
-    # task = metadata['task']
-
-    # print(task_params, metadata, task)

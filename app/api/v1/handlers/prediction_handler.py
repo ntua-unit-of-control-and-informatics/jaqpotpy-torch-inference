@@ -1,20 +1,38 @@
 from fastapi import HTTPException
+from typing import List
 
-from .prediction_handlers import regression_graph_predict
-from .prediction_handlers import binary_graph_predict
-from .prediction_handlers import multiclass_graph_predict
-
-from .prediction_handlers import regression_graph_with_external_predict
-from .prediction_handlers import binary_graph_with_external_predict
-from .prediction_handlers import multiclass_graph_with_external_predict
+from schemas import SinglePredictionResult
 
 
-from .prediction_handlers import binary_fc_predict
-from .prediction_handlers import regression_fc_predict
-from .prediction_handlers import multiclass_fc_predict
+from .prediction_handlers import (
+    regression_graph_predict,
+    binary_graph_predict,
+    multiclass_graph_predict,
+
+    regression_graph_with_external_predict,
+    binary_graph_with_external_predict,
+    multiclass_graph_with_external_predict,
+
+    regression_fc_predict,
+    binary_fc_predict,
+    multiclass_fc_predict,
+)
 
 
-def handle_prediction(model_data: dict, input_values: list):
+def handle_prediction(model_data: dict, input_values: list) -> List[SinglePredictionResult]:
+    """
+    Handles predictions based on the model type provided in `model_data`.
+
+    Args:
+    - model_data (dict): A dictionary containing model information.
+    - input_values (list): A list of inputs to use for prediction.
+
+    Returns:
+    - List[SinglePredictionResult]: A list of prediction results.
+
+    Raises:
+    - HTTPException(404): If the model type is unknown or unsupported.
+    """
 
     model_type = model_data['type']
 

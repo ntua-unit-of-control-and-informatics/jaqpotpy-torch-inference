@@ -43,6 +43,9 @@ def get_db():
              summary="Model Upload",
              description="Endpoint to upload a PyTorch Model and store it in the database.")
 async def model_upload(req: Request):
+    """
+    Endpoint to upload a PyTorch model locally using a dictionary as database.
+    """
 
     model_data = await req.json()
 
@@ -63,9 +66,13 @@ async def model_upload(req: Request):
 
 @router.post("/predict/", 
              response_model=PredictResponse,
-             summary="",
-             description="Endpoint to make predictions using a PyTorch model")
-async def predict(req: Request):
+             summary="Make predictions using a PyTorch model",
+             description="Endpoint to make predictions using a PyTorch model",
+             response_description="Prediction results")
+async def predict(req: Request) -> PredictResponse:
+    """
+    Endpoint to make predictions using a PyTorch model.
+    """
 
     request_data = await req.json()
 

@@ -8,6 +8,19 @@ from schemas import SinglePredictionResult
 
 
 def multiclass_fc_predict(model_data: dict, user_inputs: list[dict]):
+    """
+    Perform multiclass classification on tabular data using a fully-connected network.
+
+    Args:
+    - model_data (dict): A dictionary containing model information and parameters.
+        - 'actualModel' (str): Base64-encoded representation of the model script.
+        - 'additional_model_params' (dict): Additional model parameters.
+            - 'preprocessor' (str): Base64-encoded representation of the data preprocessor.
+    - user_inputs (list[dict]): List of user inputs, where each input is a dictionary.
+
+    Returns:
+    - list[SinglePredictionResult]: A list of prediction results for each user input.
+    """
 
     model_scripted_base64 = model_data['actualModel']
     model_scripted_content = base64.b64decode(model_scripted_base64)
