@@ -57,7 +57,7 @@ def binary_graph_predict(model_data: dict, user_inputs: list[dict]):
         result = SinglePredictionResult(
             id=i, 
             prediction=preds[0].item(), 
-            prob=[probs[0].item(), 1 - probs[0].item()]
+            prob=[1 - probs[0].item(), probs[0].item()]
         )
         results.append(result)
 

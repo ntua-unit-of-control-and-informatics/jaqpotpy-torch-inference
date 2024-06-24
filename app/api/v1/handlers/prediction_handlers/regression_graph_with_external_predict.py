@@ -69,9 +69,9 @@ def regression_graph_with_external_predict(model_data: dict, user_inputs: list[d
         model.eval()
         with torch.no_grad():
             try:
-                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch, edge_attr=data_point.edge_attr).squeeze(-1)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch, edge_attr=data_point.edge_attr)
             except RuntimeError: # if model doesn't support edge_attr (edge features)
-                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch).squeeze(-1)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch)
             
             outputs = outputs.squeeze(-1)
             outputs.mul_(normalization_std).add_(normalization_mean)

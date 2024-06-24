@@ -62,9 +62,9 @@ def multiclass_graph_with_external_predict(model_data, user_inputs):
         model.eval()
         with torch.no_grad():
             try:
-                outputs = model(x=data_point.x, edge_index=data_point.edge_index, batch=data_point.batch, edge_attr=data_point.edge_attr)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch, edge_attr=data_point.edge_attr)
             except RuntimeError: # if model doesn't support edge_attr (edge features)
-                outputs = model(x=data_point.x, edge_index=data_point.edge_index, batch=data_point.batch)
+                outputs = model(x=data_point.x, edge_index=data_point.edge_index, external=external, batch=data_point.batch)
 
             probs = F.softmax(outputs, dim=1)
             _, preds = torch.max(probs, 1)
